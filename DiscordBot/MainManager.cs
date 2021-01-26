@@ -15,6 +15,7 @@ namespace DiscordBot
         /// 프로그램의 진입점
         /// </summary>
         /// <param name="args"></param>
+        
         static void Main(string[] args)
         {
             new Program().BotMain().GetAwaiter().GetResult();   //봇의 진입점 실행
@@ -39,7 +40,7 @@ namespace DiscordBot
             client.Log += OnClientLogReceived;
             commands.Log += OnClientLogReceived;
 
-            await client.LoginAsync(TokenType.Bot, "ODAzMDU2ODEzNjMyMTI2OTg3.YA4O8A.nsIvNCTyW1WWshljeKWdCs47qaw"); //봇의 토큰을 사용해 서버에 로그인
+            await client.LoginAsync(TokenType.Bot, "봇 토큰"); //봇의 토큰을 사용해 서버에 로그인
             await client.StartAsync();                         //봇이 이벤트를 수신하기 시작
 
             client.MessageReceived += OnClientMessage;         //봇이 메시지를 수신할 때 처리하도록 설정
@@ -154,6 +155,62 @@ namespace DiscordBot
                 eb.AddField("나라:Korea", "아시아에 위치한 나라", true);
                 eb.AddField("언어:한국어", "한국의 언어", true);
                 await Context.Channel.SendMessageAsync("", false, eb.Build());
+            }
+        }
+        public class Command_Six : ModuleBase<SocketCommandContext>
+        {
+            Random rdm1 = new Random();
+            Random rdm2 = new Random();
+            long[] rdm_final = new long[2];
+            [Command("주사위")]
+            [Alias("랜덤", "Dice", "dice")]
+            public async Task RandomDice()
+            {
+                {
+                    rdm_final[0] = rdm1.Next(6) + 1; // 사용자의 값
+                    rdm_final[1] = rdm2.Next(6) + 1; // 컴퓨터의 값
+                    if (rdm_final[0] > rdm_final[1])
+                    {
+                        await Context.Channel.SendMessageAsync("플레이어 Win!");
+                        EmbedBuilder eb = new EmbedBuilder();
+                        eb.Color = Color.Orange;
+                        eb.Title = "Player Win!";
+                        eb.Description = "플레이어가 컴퓨터를 이겼습니다!";
+                        eb.AddField($"Player", $"{rdm_final[0]}", true);
+                        eb.AddField("Computer", $"{rdm_final[1]}", true);
+                        this.rdm_final[0] = rdm1.Next(6) + 1;
+                        this.rdm_final[1] = rdm2.Next(6) + 1;
+                        await Context.Channel.SendMessageAsync("", false, eb.Build());
+                    }
+                    if (rdm_final[0] < rdm_final[1])
+                    {
+                        await Context.Channel.SendMessageAsync("플레이어 Lose...");
+                        EmbedBuilder eb = new EmbedBuilder();
+                        eb.Color = Color.Red;
+                        eb.Title = "Player Lose";
+                        eb.Description = "플레이어가 컴퓨터에게 졌습니다.";
+                        eb.AddField("Player", $"{rdm_final[0]}");
+                        eb.AddField("Computer", $"{rdm_final[1]}");
+                        this.rdm_final[0] = rdm1.Next(6) + 1;
+                        this.rdm_final[1] = rdm2.Next(6) + 1;
+                        await Context.Channel.SendMessageAsync("", false, eb.Build());
+                    }
+                    if (rdm_final[0] == rdm_final[1])
+                    {
+                        await Context.Channel.SendMessageAsync("Vi겼습니다");
+                        EmbedBuilder eb = new EmbedBuilder();
+                        eb.Color = Color.Blue;
+                        eb.Title = "Tie";
+                        eb.Description = "Player와 Computer는 비겼습니다.";
+                        eb.AddField("Player", $"{rdm_final[0]}");
+                        eb.AddField("Computer", $"{rdm_final[1]}");
+                        this.rdm_final[0] = rdm1.Next(6) + 1;
+                        this.rdm_final[1] = rdm2.Next(6) + 1;
+                        await Context.Channel.SendMessageAsync("", false, eb.Build());
+                    }
+                    
+                }
+
             }
         }
     }
