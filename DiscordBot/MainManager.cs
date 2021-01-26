@@ -208,7 +208,7 @@ namespace DiscordBot
                         this.rdm_final[1] = rdm2.Next(6) + 1;
                         await Context.Channel.SendMessageAsync("", false, eb.Build());
                     }
-                    
+
                 }
 
             }
