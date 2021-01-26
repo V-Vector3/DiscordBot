@@ -43,7 +43,7 @@ namespace DiscordBot
             client.Log += OnClientLogReceived;
             commands.Log += OnClientLogReceived;
 
-            await client.LoginAsync(TokenType.Bot, "ODAzMDU2ODEzNjMyMTI2OTg3.YA4O8A.G4GRZ64JkhcydAldEq5-ZK2NRKc"); //봇의 토큰을 사용해 서버에 로그인
+            await client.LoginAsync(TokenType.Bot, "봇 토큰"); //봇의 토큰을 사용해 서버에 로그인
             await client.StartAsync();                         //봇이 이벤트를 수신하기 시작
 
             client.MessageReceived += OnClientMessage;         //봇이 메시지를 수신할 때 처리하도록 설정
