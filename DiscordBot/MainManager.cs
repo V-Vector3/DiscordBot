@@ -2,6 +2,8 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using System;
+using System.IO;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -9,13 +11,14 @@ namespace DiscordBot
 {
     class Program
     {
+       
         DiscordSocketClient client; //봇 클라이언트
         CommandService commands;    //명령어 수신 클라이언트
         /// <summary>
         /// 프로그램의 진입점
         /// </summary>
         /// <param name="args"></param>
-        
+
         static void Main(string[] args)
         {
             new Program().BotMain().GetAwaiter().GetResult();   //봇의 진입점 실행
@@ -40,7 +43,7 @@ namespace DiscordBot
             client.Log += OnClientLogReceived;
             commands.Log += OnClientLogReceived;
 
-            await client.LoginAsync(TokenType.Bot, "봇 토큰"); //봇의 토큰을 사용해 서버에 로그인
+            await client.LoginAsync(TokenType.Bot, "ODAzMDU2ODEzNjMyMTI2OTg3.YA4O8A.G4GRZ64JkhcydAldEq5-ZK2NRKc"); //봇의 토큰을 사용해 서버에 로그인
             await client.StartAsync();                         //봇이 이벤트를 수신하기 시작
 
             client.MessageReceived += OnClientMessage;         //봇이 메시지를 수신할 때 처리하도록 설정
@@ -73,7 +76,6 @@ namespace DiscordBot
         }
         
         
-
         /// <summary>
         /// 봇의 로그를 출력하는 함수
         /// </summary>
@@ -159,6 +161,7 @@ namespace DiscordBot
         }
         public class Command_Six : ModuleBase<SocketCommandContext>
         {
+            
             Random rdm1 = new Random();
             Random rdm2 = new Random();
             long[] rdm_final = new long[2];
@@ -181,6 +184,7 @@ namespace DiscordBot
                         this.rdm_final[0] = rdm1.Next(6) + 1;
                         this.rdm_final[1] = rdm2.Next(6) + 1;
                         await Context.Channel.SendMessageAsync("", false, eb.Build());
+                        
                     }
                     if (rdm_final[0] < rdm_final[1])
                     {
@@ -189,8 +193,8 @@ namespace DiscordBot
                         eb.Color = Color.Red;
                         eb.Title = "Player Lose";
                         eb.Description = "플레이어가 컴퓨터에게 졌습니다.";
-                        eb.AddField("Player", $"{rdm_final[0]}");
-                        eb.AddField("Computer", $"{rdm_final[1]}");
+                        eb.AddField("Player", $"{rdm_final[0]}", true);
+                        eb.AddField("Computer", $"{rdm_final[1]}", true);
                         this.rdm_final[0] = rdm1.Next(6) + 1;
                         this.rdm_final[1] = rdm2.Next(6) + 1;
                         await Context.Channel.SendMessageAsync("", false, eb.Build());
@@ -202,8 +206,8 @@ namespace DiscordBot
                         eb.Color = Color.Blue;
                         eb.Title = "Tie";
                         eb.Description = "Player와 Computer는 비겼습니다.";
-                        eb.AddField("Player", $"{rdm_final[0]}");
-                        eb.AddField("Computer", $"{rdm_final[1]}");
+                        eb.AddField("Player", $"{rdm_final[0]}", true);
+                        eb.AddField("Computer", $"{rdm_final[1]}", true);
                         this.rdm_final[0] = rdm1.Next(6) + 1;
                         this.rdm_final[1] = rdm2.Next(6) + 1;
                         await Context.Channel.SendMessageAsync("", false, eb.Build());
