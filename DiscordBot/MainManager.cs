@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -43,7 +42,7 @@ namespace DiscordBot
             client.Log += OnClientLogReceived;
             commands.Log += OnClientLogReceived;
 
-            await client.LoginAsync(TokenType.Bot, "봇 토큰"); //봇의 토큰을 사용해 서버에 로그인
+            await client.LoginAsync(TokenType.Bot, "TOKEN"); //봇의 토큰을 사용해 서버에 로그인
             await client.StartAsync();                         //봇이 이벤트를 수신하기 시작
 
             client.MessageReceived += OnClientMessage;         //봇이 메시지를 수신할 때 처리하도록 설정
@@ -215,6 +214,66 @@ namespace DiscordBot
 
                 }
 
+            }
+        }
+        public class CommandSeven : ModuleBase<SocketCommandContext>
+        {
+            List<string> sungu = new List<string>();
+            [Command("투표")]
+            [Alias("poll", "Poll", "투표한다", " 투표", "toopyo")]
+            public async Task Minjoo(string title, string b, string c)
+            {
+                try
+                {
+                    int soo = 1;
+                    if (title != null)
+                    {
+                        Console.WriteLine("통과");
+                    }
+                    else
+                    {
+                        await Context.Channel.SendMessageAsync("타이틀을 입력해 주십시오.");
+                        soo = 0;
+                    }
+                    if (b != null)
+                    {
+                        sungu.Add(b);
+                    }
+                    else
+                    {
+                        await Context.Channel.SendMessageAsync("투표값을 입력해 주십시오.");
+                        soo = 0;
+                    }
+                    if (c != null)
+                    {
+                        sungu.Add(c);
+                    }
+                    else
+                    {
+                        await Context.Channel.SendMessageAsync("투표 값을 입력해 주십시오");
+                        soo = 0;
+                    }
+
+                    if (soo == 1)
+                    {
+                        EmbedBuilder eb = new EmbedBuilder();
+                        eb.Title = $"{title}";
+                        eb.Color = Color.Blue;
+                        eb.Description = $"{b} or {c}";
+                        eb.AddField($"1.{b}", $"투표하기 {b}", true);
+                        eb.AddField($"2.{c}", $"투표하기 {c}", true);
+                        await Context.Channel.SendMessageAsync("", false, eb.Build());
+                        
+                    }
+                    if (soo == 0)
+                    {
+                        await Context.Channel.SendMessageAsync("입력값을 제데로 입력해 주세요");
+                    }
+                }
+                catch
+                {
+                    await Context.Channel.SendMessageAsync("삐빅 오류가 났습니다!");
+                }
             }
         }
     }
