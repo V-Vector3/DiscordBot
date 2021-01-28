@@ -5,12 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Google.Apis.YouTube.v3;
+using Google.Apis;
+using System.Text.RegularExpressions;
+
 
 namespace DiscordBot
 {
     class Program
     {
        
+
         DiscordSocketClient client; //봇 클라이언트
         CommandService commands;    //명령어 수신 클라이언트
         /// <summary>
@@ -42,7 +47,7 @@ namespace DiscordBot
             client.Log += OnClientLogReceived;
             commands.Log += OnClientLogReceived;
 
-            await client.LoginAsync(TokenType.Bot, "TOKEN"); //봇의 토큰을 사용해 서버에 로그인
+            await client.LoginAsync(TokenType.Bot, "ODAzMDU2ODEzNjMyMTI2OTg3.YA4O8A.6e_bs-YTmwNmbAQ-T-CwnAtUDZ4"); //봇의 토큰을 사용해 서버에 로그인
             await client.StartAsync();                         //봇이 이벤트를 수신하기 시작
 
             client.MessageReceived += OnClientMessage;         //봇이 메시지를 수신할 때 처리하도록 설정
@@ -274,6 +279,35 @@ namespace DiscordBot
                 {
                     await Context.Channel.SendMessageAsync("삐빅 오류가 났습니다!");
                 }
+            }
+        }
+        public class Command_Eight : ModuleBase<SocketCommandContext>
+        {
+            [Command("유튜브 검색")]
+            [Alias("YT검색", "Youtube검색", "유튭검색", "Youtube Search", "youtube검색", "youtube search")]
+            public async Task YTSearch(string sech)
+            {
+                if (sech == null)
+                {
+                    await Context.Channel.SendMessageAsync("검색할 값을 입력해 주십시오");
+                }
+                string Search = Regex.Replace(sech, @"\s", "");
+                await Context.Channel.SendMessageAsync($"https://www.youtube.com/results?search_query=" + $"{Search}");
+            }
+        }
+        public class Command_Nine : ModuleBase<SocketCommandContext>
+        {
+            [Command("구글 검색&네이버 검색")]
+            [Alias("Search by Google", "search by google", "search by Google", "Search Google", "Search google", "Search by naver", "Search by Naver", "search by naver", "Search by Naver&Google", "네이버검색", "네이버 검색", "Naver 검색", "naver 검색", "구글 검색", "google 검색", "Google 검색", "검색")]
+            public async Task SearchAll(string sechAll)
+            {
+                if (sechAll == null)
+                {
+                    await Context.Channel.SendMessageAsync("검색할 값을 입력해 주십시오");
+                }
+                string Search = Regex.Replace(sechAll, @"\s", "");
+                await Context.Channel.SendMessageAsync("https://www.google.com/search?q=" + $"{Search}");
+                await Context.Channel.SendMessageAsync("https://m.search.naver.com/search.naver?sm=mtb_hty.top&where=m&oquery=%EB%84%A4%EC%9D%B4%EB%B2%84&tqi=ht6IFdp0Jxossl%2BkPhlsssssty8-234953&query=" + $"{Search}");
             }
         }
     }
