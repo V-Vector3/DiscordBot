@@ -310,5 +310,31 @@ namespace DiscordBot
                 await Context.Channel.SendMessageAsync("https://m.search.naver.com/search.naver?sm=mtb_hty.top&where=m&oquery=%EB%84%A4%EC%9D%B4%EB%B2%84&tqi=ht6IFdp0Jxossl%2BkPhlsssssty8-234953&query=" + $"{Search}");
             }
         }
+        public class Command_Ten : ModuleBase<SocketCommandContext>
+        {
+            [Command("평균")]
+            [Alias("센터", "중간")]
+            public async Task Centor(params int[] centor)
+            {
+                double a = 0.0d;
+                string b = "d";
+                if (centor.GetType() == a.GetType() || centor.GetType() == b.GetType())
+                {
+                    await Context.Channel.SendMessageAsync("정수를 입력하세요.");
+                }
+                int sum = 0;
+                List<int> list = new List<int>();
+                int plus = 0;
+                for (int i = 0; i < centor.Length; ++i)
+                {
+                    if (centor[i] == 0) await Context.Channel.SendMessageAsync("0은 취급하지 않습니다.");
+                    list.Add(centor[i]);
+                    plus += centor[i];
+                    ++sum;
+                }
+                int awnser = plus / sum;
+                await Context.Channel.SendMessageAsync($"평균 값: {awnser}");
+            }
+        }
     }
 }
