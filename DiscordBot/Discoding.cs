@@ -49,7 +49,7 @@ namespace DiscordBot
             client.Log += OnClientLogReceived;
             commands.Log += OnClientLogReceived;
 
-            await client.LoginAsync(TokenType.Bot, "ODAzMDU2ODEzNjMyMTI2OTg3.YA4O8A.GUzPBEjG3O-6BwfgEC1wogaUQTo"); //봇의 토큰을 사용해 서버에 로그인
+            await client.LoginAsync(TokenType.Bot, "ODAzMDU2ODEzNjMyMTI2OTg3.YA4O8A.sUOxpEcO4j6WJzMvzO68zxz3QfI"); //봇의 토큰을 사용해 서버에 로그인
             await client.StartAsync();                         //봇이 이벤트를 수신하기 시작
 
             client.MessageReceived += OnClientMessage;         //봇이 메시지를 수신할 때 처리하도록 설정
@@ -349,8 +349,8 @@ namespace DiscordBot
                     string sUrl = "https://openapi.naver.com/v1/papago/n2mt";
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(sUrl);
                     // 헤더 추가하기 (파파고 NMT API 가이드에서 -h 부분이 헤더이다)
-                    request.Headers.Add("X-Naver-Client-Id", "");
-                    request.Headers.Add("X-Naver-Client-Secret", "");
+                    request.Headers.Add("X-Naver-Client-Id", "1YD9BdOF4mYi8fWH3Nhv");
+                    request.Headers.Add("X-Naver-Client-Secret", "7a42oYn5uT");
                     request.Method = "POST";
 
                     // 파라미터에 값 넣기 (파파고 NMT API가이드에서 -d부분이 파라미터)
@@ -399,8 +399,8 @@ namespace DiscordBot
                     string sUrl = "https://openapi.naver.com/v1/papago/n2mt";
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(sUrl);
                     // 헤더 추가하기 (파파고 NMT API 가이드에서 -h 부분이 헤더이다)
-                    request.Headers.Add("X-Naver-Client-Id", "");
-                    request.Headers.Add("X-Naver-Client-Secret", "");
+                    request.Headers.Add("X-Naver-Client-Id", "1YD9BdOF4mYi8fWH3Nhv");
+                    request.Headers.Add("X-Naver-Client-Secret", "7a42oYn5uT");
                     request.Method = "POST";
 
                     // 파라미터에 값 넣기 (파파고 NMT API가이드에서 -d부분이 파라미터)
@@ -436,6 +436,56 @@ namespace DiscordBot
                 {
                     await Context.Channel.SendMessageAsync("에러!!");
                 }
+            }
+        }
+        public class Command_Thirteen : ModuleBase<SocketCommandContext>
+        {
+            [Command("릴리즈")]
+            [Alias("프로젝트 릴리즈", "Realess")]
+            public async Task Realess(string Name, string WriteThisProject, double version, string Jongryu, string lang, string link)
+            {
+                try
+                {
+                    await Context.Channel.SendMessageAsync($"{Name}");
+                    EmbedBuilder eb = new EmbedBuilder();
+                    eb.Title = $"{Name}";
+                    eb.Color = Color.Red;
+                    eb.Description = $"{WriteThisProject}";
+                    eb.AddField("버전", $"v{version}", true);
+                    eb.AddField("종류", $"{Jongryu}", true);
+                    eb.AddField("개발 언어", $"{lang}");
+                    eb.AddField("링크", $"{link}");
+                    await Context.Channel.SendMessageAsync("", false, eb.Build());
+                }
+                catch
+                {
+                    await Context.Channel.SendMessageAsync("Error!");
+                }
+            }
+        }
+        public class Command_Forteen : ModuleBase<SocketCommandContext>
+        {
+            [Command("사용법")]
+            [Alias("봇 사용법", "봇사용법", "What are bots can do?", "기능")]
+            public async Task VangVub()
+            {
+                await Context.Channel.SendMessageAsync("봇 사용법");
+                EmbedBuilder eb = new EmbedBuilder();
+                eb.Title = "봇 사용법";
+                eb.Color = Color.Blue;
+                eb.Description = "봇 명령어의 종류와 사용법";
+                eb.AddField("1.!hi", "답변:Hello", true);
+                eb.AddField("2.!코딩 언어", "이 서버에서 얘기할수 있는 프로그래밍 언어들을 보여줌", true);
+                eb.AddField("3.!넌 누구니&!봇 리스트", "두 명령어 다 봇에 정보를 보여줌", true);
+                eb.AddField("4.!나라", "나라와 언어 정보를 보여줌", true);
+                eb.AddField("5.!주사위", "말 그대로 주사위 게임(랜덤)", true);
+                eb.AddField("6.!투표", "투표를 생성할수 있음.사용법 : !투표 (타이틀) (선택지1) (선택지2)", true);
+                eb.AddField("7.!유튜브 검색", "유튜브를 검색해 줍니다.사용법 : !유튜브 검색 (검색하고싶은거)", true);
+                eb.AddField("8.!검색", "구글&네이버를 검색해 줌.사용법 : !검색 (검색하고 싶은거)", true);
+                eb.AddField("9.!평균", "숫자들의 평균을 구해줌.사용법 : !평균 1 2 4 2 5 3 6", true);
+                eb.AddField("10.!번역", "영어 => 한국어 로 번역해줌", true);
+                eb.AddField("11.!역번역", "한국어 => 영어 로 번역해 줌", true);
+                await Context.Channel.SendMessageAsync("", false, eb.Build());
             }
         }
     }
