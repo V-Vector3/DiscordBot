@@ -49,7 +49,7 @@ namespace DiscordBot
             client.Log += OnClientLogReceived;
             commands.Log += OnClientLogReceived;
 
-            await client.LoginAsync(TokenType.Bot, "ODAzMDU2ODEzNjMyMTI2OTg3.YA4O8A.sUOxpEcO4j6WJzMvzO68zxz3QfI"); //봇의 토큰을 사용해 서버에 로그인
+            await client.LoginAsync(TokenType.Bot, ""); //봇의 토큰을 사용해 서버에 로그인
             await client.StartAsync();                         //봇이 이벤트를 수신하기 시작
 
             client.MessageReceived += OnClientMessage;         //봇이 메시지를 수신할 때 처리하도록 설정
@@ -349,8 +349,8 @@ namespace DiscordBot
                     string sUrl = "https://openapi.naver.com/v1/papago/n2mt";
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(sUrl);
                     // 헤더 추가하기 (파파고 NMT API 가이드에서 -h 부분이 헤더이다)
-                    request.Headers.Add("X-Naver-Client-Id", "1YD9BdOF4mYi8fWH3Nhv");
-                    request.Headers.Add("X-Naver-Client-Secret", "7a42oYn5uT");
+                    request.Headers.Add("X-Naver-Client-Id", "");
+                    request.Headers.Add("X-Naver-Client-Secret", "");
                     request.Method = "POST";
 
                     // 파라미터에 값 넣기 (파파고 NMT API가이드에서 -d부분이 파라미터)
@@ -399,8 +399,8 @@ namespace DiscordBot
                     string sUrl = "https://openapi.naver.com/v1/papago/n2mt";
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(sUrl);
                     // 헤더 추가하기 (파파고 NMT API 가이드에서 -h 부분이 헤더이다)
-                    request.Headers.Add("X-Naver-Client-Id", "1YD9BdOF4mYi8fWH3Nhv");
-                    request.Headers.Add("X-Naver-Client-Secret", "7a42oYn5uT");
+                    request.Headers.Add("X-Naver-Client-Id", "");
+                    request.Headers.Add("X-Naver-Client-Secret", "");
                     request.Method = "POST";
 
                     // 파라미터에 값 넣기 (파파고 NMT API가이드에서 -d부분이 파라미터)
