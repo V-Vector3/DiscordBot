@@ -5,10 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using Google.Apis.YouTube.v3;
 using Google.Apis;
 using System.Text.RegularExpressions;
-
+using System.Net;
+using System.Text;
+using System.IO;
 
 namespace DiscordBot
 {
@@ -47,7 +48,7 @@ namespace DiscordBot
             client.Log += OnClientLogReceived;
             commands.Log += OnClientLogReceived;
 
-            await client.LoginAsync(TokenType.Bot, "봇 토큰"); //봇의 토큰을 사용해 서버에 로그인
+            await client.LoginAsync(TokenType.Bot, "ODAzMDU2ODEzNjMyMTI2OTg3.YA4O8A.JhOjM9BdjYCui4mShZtNIej6Rv8"); //봇의 토큰을 사용해 서버에 로그인
             await client.StartAsync();                         //봇이 이벤트를 수신하기 시작
 
             client.MessageReceived += OnClientMessage;         //봇이 메시지를 수신할 때 처리하도록 설정
@@ -334,6 +335,59 @@ namespace DiscordBot
                 }
                 int awnser = plus / sum;
                 await Context.Channel.SendMessageAsync($"평균 값: {awnser}");
+            }
+        }
+        public class Command_Eleven : ModuleBase<SocketCommandContext>
+        {
+            [Command("번역")]
+            [Alias("파파고", "네이버 번역")]
+            public async Task 번역(string changeFirst)
+            {
+                try
+                {
+                    string sUrl = "https://openapi.naver.com/v1/papago/n2mt";
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(sUrl);
+                    // 헤더 추가하기 (파파고 NMT API 가이드에서 -h 부분이 헤더이다)
+                    request.Headers.Add("X-Naver-Client-Id", "API 아이디 코드");
+                    request.Headers.Add("X-Naver-Client-Secret", "API 시크릿 코드");
+                    request.Method = "POST";
+
+                    // 파라미터에 값 넣기 (파파고 NMT API가이드에서 -d부분이 파라미터)
+                    //string sParam = string.Format("source=auto&target=en&text="+txtSendText.Text);
+
+                    string Original_string = $"{changeFirst}"; // 번역하고싶은 데이터
+
+                    // 파라미터를 char Set에 맞게 변경
+                    byte[] bytearry = Encoding.UTF8.GetBytes("source=en&target=ko&text=" + Original_string);
+
+                    request.ContentType = "application/x-www-form-urlencoded";
+
+                    // 요청 데이터 길이
+                    request.ContentLength = bytearry.Length;
+
+                    Stream st = request.GetRequestStream();
+                    st.Write(bytearry, 0, bytearry.Length);
+                    st.Close();
+
+                    // 응답 데이터 가져오기 (출력포맷)
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    Stream stream = response.GetResponseStream();
+                    StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+                    string text = reader.ReadToEnd();
+
+                    stream.Close();
+                    response.Close();
+                    reader.Close();
+
+
+                    await Context.Channel.SendMessageAsync($"번역 된 값 : " + $"{text}"); // 결과 출력
+                }
+                catch (Exception ex)
+                {
+                    await Context.Channel.SendMessageAsync("api에서 오류가 발생하여 번역에 실패했습니다.");
+                    //api에서 문제가 생겨도 여기서 오류가 발생한다.
+                    //오류 내용을 확인해서 로그를 남겨야 할듯
+                }
             }
         }
     }
