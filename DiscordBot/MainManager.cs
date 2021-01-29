@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Net;
 using System.Text;
 using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace DiscordBot
 {
@@ -48,7 +49,7 @@ namespace DiscordBot
             client.Log += OnClientLogReceived;
             commands.Log += OnClientLogReceived;
 
-            await client.LoginAsync(TokenType.Bot, "ODAzMDU2ODEzNjMyMTI2OTg3.YA4O8A.JhOjM9BdjYCui4mShZtNIej6Rv8"); //봇의 토큰을 사용해 서버에 로그인
+            await client.LoginAsync(TokenType.Bot, "ODAzMDU2ODEzNjMyMTI2OTg3.YA4O8A.GUzPBEjG3O-6BwfgEC1wogaUQTo"); //봇의 토큰을 사용해 서버에 로그인
             await client.StartAsync();                         //봇이 이벤트를 수신하기 시작
 
             client.MessageReceived += OnClientMessage;         //봇이 메시지를 수신할 때 처리하도록 설정
@@ -348,8 +349,8 @@ namespace DiscordBot
                     string sUrl = "https://openapi.naver.com/v1/papago/n2mt";
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(sUrl);
                     // 헤더 추가하기 (파파고 NMT API 가이드에서 -h 부분이 헤더이다)
-                    request.Headers.Add("X-Naver-Client-Id", "API 아이디 코드");
-                    request.Headers.Add("X-Naver-Client-Secret", "API 시크릿 코드");
+                    request.Headers.Add("X-Naver-Client-Id", "");
+                    request.Headers.Add("X-Naver-Client-Secret", "");
                     request.Method = "POST";
 
                     // 파라미터에 값 넣기 (파파고 NMT API가이드에서 -d부분이 파라미터)
@@ -378,15 +379,62 @@ namespace DiscordBot
                     stream.Close();
                     response.Close();
                     reader.Close();
-
-
-                    await Context.Channel.SendMessageAsync($"번역 된 값 : " + $"{text}"); // 결과 출력
+                    JObject jObject = JObject.Parse(text);
+                    await Context.Channel.SendMessageAsync($"번역 된 값 : " + $"{jObject["message"]["result"]["translatedText"].ToString()}"); // 결과 출력
                 }
                 catch (Exception ex)
                 {
-                    await Context.Channel.SendMessageAsync("api에서 오류가 발생하여 번역에 실패했습니다.");
-                    //api에서 문제가 생겨도 여기서 오류가 발생한다.
-                    //오류 내용을 확인해서 로그를 남겨야 할듯
+                    await Context.Channel.SendMessageAsync("에러!!");
+                }
+            }
+        }
+        public class Command_Twelve : ModuleBase<SocketCommandContext>
+        {
+            [Command("역번역")]
+            [Alias("거꾸로 번역", "거꾸로번역", "역 파파고", "역파파고", "거꾸로 파파고", "거꾸로 파파고")]
+            public async Task 역번역(string downPapago)
+            {
+                try
+                {
+                    string sUrl = "https://openapi.naver.com/v1/papago/n2mt";
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(sUrl);
+                    // 헤더 추가하기 (파파고 NMT API 가이드에서 -h 부분이 헤더이다)
+                    request.Headers.Add("X-Naver-Client-Id", "");
+                    request.Headers.Add("X-Naver-Client-Secret", "");
+                    request.Method = "POST";
+
+                    // 파라미터에 값 넣기 (파파고 NMT API가이드에서 -d부분이 파라미터)
+                    //string sParam = string.Format("source=auto&target=en&text="+txtSendText.Text);
+
+                    string Original_string = $"{downPapago}"; // 번역하고싶은 데이터
+
+                    // 파라미터를 char Set에 맞게 변경
+                    byte[] bytearry = Encoding.UTF8.GetBytes("source=ko&target=en&text=" + Original_string);
+
+                    request.ContentType = "application/x-www-form-urlencoded";
+
+                    // 요청 데이터 길이
+                    request.ContentLength = bytearry.Length;
+
+                    Stream st = request.GetRequestStream();
+                    st.Write(bytearry, 0, bytearry.Length);
+                    st.Close();
+
+                    // 응답 데이터 가져오기 (출력포맷)
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    Stream stream = response.GetResponseStream();
+                    StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+                    string text = reader.ReadToEnd();
+
+                    stream.Close();
+                    response.Close();
+                    reader.Close();
+                    JObject jObject = JObject.Parse(text);
+                    await Context.Channel.SendMessageAsync($"번역 된 값 : " + $"{jObject["message"]["result"]["translatedText"].ToString()}");
+                }
+                catch (Exception ex)
+                {
+                    await Context.Channel.SendMessageAsync("에러!!");
                 }
             }
         }
