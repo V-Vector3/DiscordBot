@@ -11,6 +11,13 @@ using System.Net;
 using System.Text;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using Discord.Audio;
+using NAudio.Wave;
+using VideoLibrary;
+using Xabe.FFmpeg;
+using Xabe.FFmpeg.Downloader;
+
+    
 
 namespace DiscordBot
 {
@@ -49,7 +56,7 @@ namespace DiscordBot
             client.Log += OnClientLogReceived;
             commands.Log += OnClientLogReceived;
 
-            await client.LoginAsync(TokenType.Bot, ""); //봇의 토큰을 사용해 서버에 로그인
+            await client.LoginAsync(TokenType.Bot, "ODAzMDU2ODEzNjMyMTI2OTg3.YA4O8A.gZU-8nDvkIoXiT-pYHd-l6OpwzE"); //봇의 토큰을 사용해 서버에 로그인
             await client.StartAsync();                         //봇이 이벤트를 수신하기 시작
 
             client.MessageReceived += OnClientMessage;         //봇이 메시지를 수신할 때 처리하도록 설정
@@ -316,17 +323,17 @@ namespace DiscordBot
         {
             [Command("평균")]
             [Alias("센터", "중간")]
-            public async Task Centor(params int[] centor)
+            public async Task Centor(params double[] centor)
             {
-                double a = 0.0d;
+                int a = 0;
                 string b = "d";
                 if (centor.GetType() == a.GetType() || centor.GetType() == b.GetType())
                 {
                     await Context.Channel.SendMessageAsync("정수를 입력하세요.");
                 }
-                int sum = 0;
-                List<int> list = new List<int>();
-                int plus = 0;
+                double sum = 0;
+                List<double> list = new List<double>();
+                double plus = 0;
                 for (int i = 0; i < centor.Length; ++i)
                 {
                     if (centor[i] == 0) await Context.Channel.SendMessageAsync("0은 취급하지 않습니다.");
@@ -334,7 +341,7 @@ namespace DiscordBot
                     plus += centor[i];
                     ++sum;
                 }
-                int awnser = plus / sum;
+                double awnser = plus / sum;
                 await Context.Channel.SendMessageAsync($"평균 값: {awnser}");
             }
         }
@@ -349,8 +356,8 @@ namespace DiscordBot
                     string sUrl = "https://openapi.naver.com/v1/papago/n2mt";
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(sUrl);
                     // 헤더 추가하기 (파파고 NMT API 가이드에서 -h 부분이 헤더이다)
-                    request.Headers.Add("X-Naver-Client-Id", "");
-                    request.Headers.Add("X-Naver-Client-Secret", "");
+                    request.Headers.Add("X-Naver-Client-Id", "1YD9BdOF4mYi8fWH3Nhv");
+                    request.Headers.Add("X-Naver-Client-Secret", "7a42oYn5uT");
                     request.Method = "POST";
 
                     // 파라미터에 값 넣기 (파파고 NMT API가이드에서 -d부분이 파라미터)
@@ -399,8 +406,8 @@ namespace DiscordBot
                     string sUrl = "https://openapi.naver.com/v1/papago/n2mt";
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(sUrl);
                     // 헤더 추가하기 (파파고 NMT API 가이드에서 -h 부분이 헤더이다)
-                    request.Headers.Add("X-Naver-Client-Id", "");
-                    request.Headers.Add("X-Naver-Client-Secret", "");
+                    request.Headers.Add("X-Naver-Client-Id", "1YD9BdOF4mYi8fWH3Nhv");
+                    request.Headers.Add("X-Naver-Client-Secret", "7a42oYn5uT");
                     request.Method = "POST";
 
                     // 파라미터에 값 넣기 (파파고 NMT API가이드에서 -d부분이 파라미터)
@@ -485,7 +492,80 @@ namespace DiscordBot
                 eb.AddField("9.!평균", "숫자들의 평균을 구해줌.사용법 : !평균 1 2 4 2 5 3 6", true);
                 eb.AddField("10.!번역", "영어 => 한국어 로 번역해줌", true);
                 eb.AddField("11.!역번역", "한국어 => 영어 로 번역해 줌", true);
+                eb.AddField("12.!릴리즈", "프로젝트를 올리게 도와주는 명령어.사용법 : !릴리즈 (이름) (설명) (버전(꼭 실수여야 함)) (종류(오프소스 등등)) (개발언어(Python,C#,C++등등)) (github 링크");
                 await Context.Channel.SendMessageAsync("", false, eb.Build());
+            }
+        }
+        public class MusicFunc : ModuleBase<SocketCommandContext>
+        {
+            [Command("play", RunMode = RunMode.Async)]
+            public async Task DownAndPlay(string url = null)
+            {
+                if (url == null)    //url이 매개변수로 주어지지 않았을 경우
+                {
+                    await Context.Channel.SendMessageAsync("영상의 링크를 제공해주세요.");
+                    return;
+                }
+
+                if (Context.Guild.CurrentUser.VoiceChannel == null) //사용자가 음성 채널에 들어가지 않은 경우
+                {
+                    await Context.Channel.SendMessageAsync("음악을 재생하려면 음성 채널에 있어야 합니다.");
+                    return;
+                }
+
+                await Context.Channel.SendMessageAsync("영상 다운로드 시작");
+
+                YouTube yt = YouTube.Default;   //VideoLibrary의 유튜브 인스턴스 초기화
+                YouTubeVideo video = await yt.GetVideoAsync(url);   //링크의 영상을 변수에 저장
+
+                //영상을 저장할 폴더가 없다면 생성
+                if (!Directory.Exists(Environment.CurrentDirectory + "\\audio\\"))
+                    Directory.CreateDirectory(Environment.CurrentDirectory + "\\audio\\");
+
+                string videoPath = Environment.CurrentDirectory + "\\audio\\" + video.FullName;
+                //폴더 속에 영상을 다운로드
+                await File.WriteAllBytesAsync(videoPath, await video.GetBytesAsync());
+                await Context.Channel.SendMessageAsync("영상 다운로드 완료");
+
+                //FFmpeg 경로 설정
+                FFmpeg.SetExecutablesPath(Environment.CurrentDirectory);
+                await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official);    //FFmpeg 다운로드
+
+                //영상파일에서 음성파일로 변환
+                await Conversion.ExtractAudio(
+                videoPath,
+                Path.ChangeExtension(videoPath, ".mp3")).Start();
+
+                //영상파일 삭제
+                File.Delete(videoPath);
+
+                await Context.Channel.SendMessageAsync("음성 추출 완료");
+                //유저에게 보내기
+                var audioClient = await ((IGuildUser)Context.User).VoiceChannel.ConnectAsync();
+
+                //음성 파일을 스트림 형태로 읽기
+                var reader = new Mp3FileReader(Path.ChangeExtension(videoPath, ".mp3"));
+                var naudio = WaveFormatConversionStream.CreatePcmStream(reader);
+
+                //음성 채널과 연결된 음성 스트림 생성
+                var audioStream = audioClient.CreatePCMStream(AudioApplication.Music);
+
+                byte[] buffer = new byte[naudio.Length];    //음성 데이터 버퍼
+
+                int count = (int)(naudio.Length - naudio.Position);  //읽어들일 데이터의 크기
+                await naudio.ReadAsync(buffer, 0, count);    //음성 파일의 데이터를 버퍼에 저장
+                await audioStream.WriteAsync(buffer, 0, count);  //버퍼의 데이터를 음성 채널 스트림에 저장
+
+                //스트림 정리
+                await audioStream.FlushAsync();
+                await ((IGuildUser)Context.User).VoiceChannel.DisconnectAsync();
+                await audioStream.DisposeAsync();
+                audioClient.Dispose();
+                await naudio.DisposeAsync();
+                await reader.DisposeAsync();
+
+                //음성 파일 삭제
+                File.Delete(Path.ChangeExtension(videoPath, ".mp3"));
             }
         }
     }
